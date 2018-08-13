@@ -117,13 +117,13 @@ func openOrchestratorMySQLGeneric() (db *sql.DB, fromCache bool, err error) {
 	if config.Config.MySQLOrchestratorUseMutualTLS {
 		uri, _ = SetupMySQLOrchestratorTLS(uri)
 	}
-	if db, _, err = sqlutils.GetDB(uri); err != nil {
-		return nil, err
+	if db, fromCache, err = sqlutils.GetDB(uri); err != nil {
+		return nil, fromCache, err
 	}
 	if config.Config.MySQLOrchestratorWaitTimeout > 0 {
 		db.SetConnMaxLifetime(time.Duration(config.Config.MySQLOrchestratorWaitTimeout) * time.Second)
 	}
-	return db, err
+	return db, fromCache, err
 }
 
 func IsSQLite() bool {
