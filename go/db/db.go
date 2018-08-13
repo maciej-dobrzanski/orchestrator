@@ -97,7 +97,7 @@ func openTopology(host string, port int, readTimeout int) (db *sql.DB, err error
 		return nil, err
 	}
 	if config.Config.MySQLOrchestratorWaitTimeout > 0 {
-		db.SetConnMaxLifetime(config.Config.MySQLOrchestratorWaitTimeout)
+		db.SetConnMaxLifetime(time.Duration(config.Config.MySQLOrchestratorWaitTimeout) * time.Second)
 	}
 	db.SetMaxOpenConns(config.MySQLTopologyMaxPoolConnections)
 	db.SetMaxIdleConns(config.MySQLTopologyMaxPoolConnections)
@@ -120,7 +120,7 @@ func openOrchestratorMySQLGeneric() (db *sql.DB, fromCache bool, err error) {
 		return nil, err
 	}
 	if config.Config.MySQLOrchestratorWaitTimeout > 0 {
-		db.SetConnMaxLifetime(config.Config.MySQLOrchestratorWaitTimeout)
+		db.SetConnMaxLifetime(time.Duration(config.Config.MySQLOrchestratorWaitTimeout) * time.Second)
 	}
 	return db, err
 }
@@ -164,7 +164,7 @@ func OpenOrchestrator() (db *sql.DB, err error) {
 				db.SetMaxOpenConns(config.Config.MySQLOrchestratorMaxPoolConnections)
 			}
 			if config.Config.MySQLOrchestratorWaitTimeout > 0 {
-				db.SetConnMaxLifetime(config.Config.MySQLOrchestratorWaitTimeout)
+				db.SetConnMaxLifetime(time.Duration(config.Config.MySQLOrchestratorWaitTimeout) * time.Second)
 			}
 		}
 	}
