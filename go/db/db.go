@@ -96,6 +96,9 @@ func openTopology(host string, port int, readTimeout int) (db *sql.DB, err error
 	if db, _, err = sqlutils.GetDB(mysql_uri); err != nil {
 		return nil, err
 	}
+	if config.Config.MySQLOrchestratorWaitTimeout > 0 {
+		db.SetConnMaxLifetime(config.Config.MySQLOrchestratorWaitTimeout)
+	}
 	db.SetMaxOpenConns(config.MySQLTopologyMaxPoolConnections)
 	db.SetMaxIdleConns(config.MySQLTopologyMaxPoolConnections)
 	return db, err
@@ -113,7 +116,13 @@ func openOrchestratorMySQLGeneric() (db *sql.DB, fromCache bool, err error) {
 	if config.Config.MySQLOrchestratorUseMutualTLS {
 		uri, _ = SetupMySQLOrchestratorTLS(uri)
 	}
-	return sqlutils.GetDB(uri)
+	if db, _, err = sqlutils.GetDB(uri); err != nil {
+		return nil, err
+	}
+	if config.Config.MySQLOrchestratorWaitTimeout > 0 {
+		db.SetConnMaxLifetime(config.Config.MySQLOrchestratorWaitTimeout)
+	}
+	return db, err
 }
 
 func IsSQLite() bool {
@@ -153,6 +162,9 @@ func OpenOrchestrator() (db *sql.DB, err error) {
 			if config.Config.MySQLOrchestratorMaxPoolConnections > 0 {
 				log.Debugf("Orchestrator pool SetMaxOpenConns: %d", config.Config.MySQLOrchestratorMaxPoolConnections)
 				db.SetMaxOpenConns(config.Config.MySQLOrchestratorMaxPoolConnections)
+			}
+			if config.Config.MySQLOrchestratorWaitTimeout > 0 {
+				db.SetConnMaxLifetime(config.Config.MySQLOrchestratorWaitTimeout)
 			}
 		}
 	}
